@@ -3,6 +3,7 @@ import { RefreshCw } from 'lucide-react'
 import type { CurrentWeather } from '@/types/current-weather'
 import type { DailyForecast } from '@/types/daily-forecast'
 import type { GeoResult } from '@/types/geo-result'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { WeatherIcon } from '@/lib/weather-icon'
 import { skyForCode } from '@/lib/sky'
 import { roundTemperature, formatTemperature } from '@/lib/format'
@@ -13,6 +14,7 @@ type WeatherHeroProps = {
   current: CurrentWeather
   today: DailyForecast | null
   windUnit: string
+  unit: TemperatureUnit
   onRefresh: () => void
 }
 
@@ -31,19 +33,19 @@ function HeroHeader({ location, onRefresh }: { location: GeoResult; onRefresh: (
   )
 }
 
-function HeroReadout({ current, today }: { current: CurrentWeather; today: DailyForecast | null }) {
+function HeroReadout({ current, today, unit }: { current: CurrentWeather; today: DailyForecast | null; unit: TemperatureUnit }) {
   return (
     <div className="wx-hero-body">
       <div className="wx-temp-block">
         <div className="wx-temp">
-          {roundTemperature(current.temperature)}
+          {roundTemperature(current.temperature, unit)}
           <span className="deg">°</span>
         </div>
         <div className="wx-temp-side">
           <div className="wx-cond">{current.condition.label}</div>
           <div className="wx-hilo">
-            <span>Máx <b>{formatTemperature(today?.temp_max ?? null)}</b></span>
-            <span>Mín <b>{formatTemperature(today?.temp_min ?? null)}</b></span>
+            <span>Máx <b>{formatTemperature(today?.temp_max ?? null, unit)}</b></span>
+            <span>Mín <b>{formatTemperature(today?.temp_min ?? null, unit)}</b></span>
           </div>
         </div>
       </div>
@@ -54,7 +56,7 @@ function HeroReadout({ current, today }: { current: CurrentWeather; today: Daily
   )
 }
 
-export function WeatherHero({ location, current, today, windUnit, onRefresh }: WeatherHeroProps) {
+export function WeatherHero({ location, current, today, windUnit, unit, onRefresh }: WeatherHeroProps) {
   const isDay = current.is_day === 1
   const sky = useMemo(() => skyForCode(current.condition.code, isDay), [current.condition.code, isDay])
   const skyStyle = { '--sky-1': sky.from, '--sky-2': sky.via, '--sky-3': sky.to } as CSSProperties
@@ -62,8 +64,8 @@ export function WeatherHero({ location, current, today, windUnit, onRefresh }: W
   return (
     <section className="wx-hero" aria-live="polite" aria-label={`Clima atual em ${location.name}`} style={skyStyle}>
       <HeroHeader location={location} onRefresh={onRefresh} />
-      <HeroReadout current={current} today={today} />
-      <HeroQuickStats current={current} today={today} windUnit={windUnit} />
+      <HeroReadout current={current} today={today} unit={unit} />
+      <HeroQuickStats current={current} today={today} windUnit={windUnit} unit={unit} />
     </section>
   )
 }

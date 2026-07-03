@@ -145,4 +145,43 @@ describe('WeatherDashboardPage', () => {
     // Assert — content now renders
     expect(screen.getByText('Previsão de 7 dias')).toBeInTheDocument()
   })
+
+  it('CUR-10 toggles every temperature between °C and °F and leaves other units intact', async () => {
+    // Arrange
+    searchCitiesMock.mockResolvedValue([LONDON])
+    fetchWeatherMock.mockResolvedValue(buildPayload())
+    render(<WeatherDashboardPage />)
+
+    // Act — load a city (current 21.4°C, daily[0] 12–22°C, wind 12 km/h)
+    await searchAndPick('London')
+
+    const hero = document.querySelector('.wx-hero') as HTMLElement
+    const firstDay = document.querySelector('.wx-drow') as HTMLElement
+    const heroTemp = () => hero.querySelector('.wx-temp')?.textContent
+    const dayHi = () => firstDay.querySelector('.hi')?.textContent
+    const dayLo = () => firstDay.querySelector('.lo')?.textContent
+
+    // Assert — Celsius is the default, wind is metric
+    expect(heroTemp()).toBe('21°')
+    expect(dayHi()).toBe('22°')
+    expect(dayLo()).toBe('12°')
+    expect(within(hero).getByText('12 km/h NO')).toBeInTheDocument()
+
+    // Act — switch to Fahrenheit
+    fireEvent.click(screen.getByRole('button', { name: 'Fahrenheit' }))
+
+    // Assert — every temperature converts (F = C × 9/5 + 32, rounded); wind untouched
+    expect(heroTemp()).toBe('71°') // 21.4 → 70.52 → 71
+    expect(dayHi()).toBe('72°') // 22 → 71.6 → 72
+    expect(dayLo()).toBe('54°') // 12 → 53.6 → 54
+    expect(within(hero).getByText('12 km/h NO')).toBeInTheDocument()
+
+    // Act — switch back to Celsius
+    fireEvent.click(screen.getByRole('button', { name: 'Celsius' }))
+
+    // Assert — original Celsius readings restored
+    expect(heroTemp()).toBe('21°')
+    expect(dayHi()).toBe('22°')
+    expect(dayLo()).toBe('12°')
+  })
 })

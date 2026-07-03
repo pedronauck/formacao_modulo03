@@ -9,7 +9,7 @@ describe('DetailedMetricsCard', () => {
     const current = buildCurrent()
 
     // Act
-    render(<DetailedMetricsCard current={current} uv={{ value: 6, label: 'Alto' }} windUnit="km/h" />)
+    render(<DetailedMetricsCard current={current} uv={{ value: 6, label: 'Alto' }} windUnit="km/h" unit="celsius" />)
 
     // Assert — RF7/RF15
     expect(screen.getByText('Índice UV')).toBeInTheDocument()
@@ -21,7 +21,7 @@ describe('DetailedMetricsCard', () => {
 
   it('#49 falls back to a placeholder when UV is unavailable', () => {
     // Arrange / Act
-    render(<DetailedMetricsCard current={buildCurrent()} uv={null} windUnit="km/h" />)
+    render(<DetailedMetricsCard current={buildCurrent()} uv={null} windUnit="km/h" unit="celsius" />)
 
     // Assert
     expect(screen.getByText('Índice UV')).toBeInTheDocument()

@@ -9,7 +9,7 @@ describe('HourlyForecastCard', () => {
     const { hourly } = buildPayload()
 
     // Act
-    const { container } = render(<HourlyForecastCard hours={hourly} />)
+    const { container } = render(<HourlyForecastCard hours={hourly} unit="celsius" />)
 
     // Assert — RF9–RF11
     expect(container.querySelectorAll('.wx-hgc')).toHaveLength(24)

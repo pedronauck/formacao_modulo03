@@ -1,14 +1,21 @@
+import type { TemperatureUnit } from '@/types/temperature-unit'
+
 const PLACEHOLDER = '—'
 
-export function roundTemperature(celsius: number | null): string {
+export function celsiusToFahrenheit(celsius: number): number {
+  return celsius * 9 / 5 + 32
+}
+
+export function roundTemperature(celsius: number | null, unit: TemperatureUnit = 'celsius'): string {
   if (celsius === null || Number.isNaN(celsius)) {
     return PLACEHOLDER
   }
-  return String(Math.round(celsius))
+  const value = unit === 'fahrenheit' ? celsiusToFahrenheit(celsius) : celsius
+  return String(Math.round(value))
 }
 
-export function formatTemperature(celsius: number | null): string {
-  const rounded = roundTemperature(celsius)
+export function formatTemperature(celsius: number | null, unit: TemperatureUnit = 'celsius'): string {
+  const rounded = roundTemperature(celsius, unit)
   return rounded === PLACEHOLDER ? PLACEHOLDER : `${rounded}°`
 }
 

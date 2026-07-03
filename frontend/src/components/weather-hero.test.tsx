@@ -21,7 +21,7 @@ describe('WeatherHero', () => {
 
     // Act
     const { container } = render(
-      <WeatherHero location={LONDON} current={current} today={TODAY} windUnit="km/h" onRefresh={vi.fn()} />,
+      <WeatherHero location={LONDON} current={current} today={TODAY} windUnit="km/h" unit="celsius" onRefresh={vi.fn()} />,
     )
 
     // Assert — RF5–RF8
@@ -38,7 +38,7 @@ describe('WeatherHero', () => {
   it('#43 marks the hero container as an aria-live polite region', () => {
     // Arrange / Act
     const { container } = render(
-      <WeatherHero location={LONDON} current={buildCurrent()} today={TODAY} windUnit="km/h" onRefresh={vi.fn()} />,
+      <WeatherHero location={LONDON} current={buildCurrent()} today={TODAY} windUnit="km/h" unit="celsius" onRefresh={vi.fn()} />,
     )
 
     // Assert

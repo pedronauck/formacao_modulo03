@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Calendar } from 'lucide-react'
 import type { DailyForecast } from '@/types/daily-forecast'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { WeatherIcon } from '@/lib/weather-icon'
 import { labelForCode } from '@/lib/weather-code'
 import { formatTemperature, formatPercent, formatWeekday } from '@/lib/format'
@@ -10,9 +11,10 @@ type DailyRowProps = {
   isToday: boolean
   weekMin: number
   weekSpan: number
+  unit: TemperatureUnit
 }
 
-function DailyRow({ day, isToday, weekMin, weekSpan }: DailyRowProps) {
+function DailyRow({ day, isToday, weekMin, weekSpan, unit }: DailyRowProps) {
   const left = ((day.temp_min - weekMin) / weekSpan) * 100
   const width = Math.max(8, ((day.temp_max - day.temp_min) / weekSpan) * 100)
   const hasRain = day.precipitation_probability_max > 0
@@ -24,9 +26,9 @@ function DailyRow({ day, isToday, weekMin, weekSpan }: DailyRowProps) {
       </div>
       <div className={hasRain ? 'wx-dpop' : 'wx-dpop zero'}>{hasRain ? formatPercent(day.precipitation_probability_max) : '—'}</div>
       <div className="wx-drange">
-        <span className="lo">{formatTemperature(day.temp_min)}</span>
+        <span className="lo">{formatTemperature(day.temp_min, unit)}</span>
         <span className="bar"><i className="fill" style={{ left: `${left}%`, width: `${width}%` }} /></span>
-        <span className="hi">{formatTemperature(day.temp_max)}</span>
+        <span className="hi">{formatTemperature(day.temp_max, unit)}</span>
       </div>
     </div>
   )
@@ -34,9 +36,10 @@ function DailyRow({ day, isToday, weekMin, weekSpan }: DailyRowProps) {
 
 type DailyForecastCardProps = {
   days: DailyForecast[]
+  unit: TemperatureUnit
 }
 
-export function DailyForecastCard({ days }: DailyForecastCardProps) {
+export function DailyForecastCard({ days, unit }: DailyForecastCardProps) {
   const range = useMemo(() => {
     const weekMin = Math.min(...days.map((day) => day.temp_min))
     const weekSpan = Math.max(...days.map((day) => day.temp_max)) - weekMin || 1
@@ -51,7 +54,7 @@ export function DailyForecastCard({ days }: DailyForecastCardProps) {
       </div>
       <div className="wx-daily">
         {days.map((day, index) => (
-          <DailyRow key={day.date} day={day} isToday={index === 0} weekMin={range.weekMin} weekSpan={range.weekSpan} />
+          <DailyRow key={day.date} day={day} isToday={index === 0} weekMin={range.weekMin} weekSpan={range.weekSpan} unit={unit} />
         ))}
       </div>
     </section>

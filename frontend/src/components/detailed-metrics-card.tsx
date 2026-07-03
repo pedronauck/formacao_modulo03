@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from 'react'
 import { Thermometer, Wind, Droplets, Gauge, Cloud, CloudRain, Sun } from 'lucide-react'
 import type { CurrentWeather } from '@/types/current-weather'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { formatTemperature, formatPercent, formatMeasure, formatCardinal } from '@/lib/format'
 
 type Uv = { value: number; label: string } | null
@@ -15,9 +16,9 @@ const UV_COLOR: Record<string, string> = {
 
 type Metric = { label: string; icon: ReactNode; value: string; sub: string }
 
-function buildMetrics(current: CurrentWeather, windUnit: string): Metric[] {
+function buildMetrics(current: CurrentWeather, windUnit: string, unit: TemperatureUnit): Metric[] {
   return [
-    { label: 'Sensação', icon: <Thermometer aria-hidden="true" />, value: formatTemperature(current.apparent_temperature), sub: `Real ${formatTemperature(current.temperature)}` },
+    { label: 'Sensação', icon: <Thermometer aria-hidden="true" />, value: formatTemperature(current.apparent_temperature, unit), sub: `Real ${formatTemperature(current.temperature, unit)}` },
     { label: 'Vento', icon: <Wind aria-hidden="true" />, value: formatMeasure(current.wind_speed, windUnit), sub: formatCardinal(current.wind_direction) },
     { label: 'Umidade', icon: <Droplets aria-hidden="true" />, value: formatPercent(current.humidity), sub: 'umidade relativa' },
     { label: 'Pressão', icon: <Gauge aria-hidden="true" />, value: formatMeasure(current.pressure, 'hPa'), sub: 'nível do mar' },
@@ -56,10 +57,11 @@ type DetailedMetricsCardProps = {
   current: CurrentWeather
   uv: Uv
   windUnit: string
+  unit: TemperatureUnit
 }
 
-export function DetailedMetricsCard({ current, uv, windUnit }: DetailedMetricsCardProps) {
-  const metrics = useMemo(() => buildMetrics(current, windUnit), [current, windUnit])
+export function DetailedMetricsCard({ current, uv, windUnit, unit }: DetailedMetricsCardProps) {
+  const metrics = useMemo(() => buildMetrics(current, windUnit, unit), [current, windUnit, unit])
 
   return (
     <section className="wx-card" aria-label="Condições detalhadas">

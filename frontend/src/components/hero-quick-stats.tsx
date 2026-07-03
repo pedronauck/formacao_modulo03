@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
 import type { CurrentWeather } from '@/types/current-weather'
 import type { DailyForecast } from '@/types/daily-forecast'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { formatTemperature, formatPercent, formatMeasure, formatCardinal } from '@/lib/format'
 
 type HeroQuickStatsProps = {
   current: CurrentWeather
   today: DailyForecast | null
   windUnit: string
+  unit: TemperatureUnit
 }
 
 function QuickStat({ label, value }: { label: string; value: string }) {
@@ -18,7 +20,7 @@ function QuickStat({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function HeroQuickStats({ current, today, windUnit }: HeroQuickStatsProps) {
+export function HeroQuickStats({ current, today, windUnit, unit }: HeroQuickStatsProps) {
   const wind = useMemo(
     () => `${formatMeasure(current.wind_speed, windUnit)} ${formatCardinal(current.wind_direction)}`,
     [current.wind_speed, current.wind_direction, windUnit],
@@ -30,7 +32,7 @@ export function HeroQuickStats({ current, today, windUnit }: HeroQuickStatsProps
 
   return (
     <div className="wx-hero-quick">
-      <QuickStat label="Sensação" value={formatTemperature(current.apparent_temperature)} />
+      <QuickStat label="Sensação" value={formatTemperature(current.apparent_temperature, unit)} />
       <QuickStat label="Vento" value={wind} />
       <QuickStat label="Umidade" value={formatPercent(current.humidity)} />
       <QuickStat label="Prob. de chuva" value={formatPercent(rainChance)} />
