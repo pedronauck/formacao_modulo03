@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Clock, Droplet } from 'lucide-react'
 import type { HourlyForecast } from '@/types/hourly-forecast'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { WeatherIcon } from '@/lib/weather-icon'
 import { formatTemperature, formatTime, formatPercent } from '@/lib/format'
 
@@ -36,11 +37,11 @@ function CurveSvg({ curve }: { curve: Curve }) {
   )
 }
 
-function HourColumn({ hour, isNow, labelTop }: { hour: HourlyForecast; isNow: boolean; labelTop: number }) {
+function HourColumn({ hour, isNow, labelTop, unit }: { hour: HourlyForecast; isNow: boolean; labelTop: number; unit: TemperatureUnit }) {
   return (
     <div className={isNow ? 'wx-hgc now' : 'wx-hgc'}>
       <div className="wx-hg-band">
-        <span className="wx-hg-temp" style={{ top: labelTop }}>{formatTemperature(hour.temperature)}</span>
+        <span className="wx-hg-temp" style={{ top: labelTop }}>{formatTemperature(hour.temperature, unit)}</span>
       </div>
       <div className="wx-hg-ic">
         <WeatherIcon code={hour.weather_code} isDay={hour.is_day === 1} size={26} />
@@ -60,9 +61,10 @@ function HourColumn({ hour, isNow, labelTop }: { hour: HourlyForecast; isNow: bo
 
 type HourlyForecastCardProps = {
   hours: HourlyForecast[]
+  unit: TemperatureUnit
 }
 
-export function HourlyForecastCard({ hours }: HourlyForecastCardProps) {
+export function HourlyForecastCard({ hours, unit }: HourlyForecastCardProps) {
   const curve = useMemo(() => buildCurve(hours.map((hour) => hour.temperature)), [hours])
 
   return (
@@ -77,7 +79,7 @@ export function HourlyForecastCard({ hours }: HourlyForecastCardProps) {
           <CurveSvg curve={curve} />
           <div className="wx-hg-row">
             {hours.map((hour, index) => (
-              <HourColumn key={hour.time} hour={hour} isNow={index === 0} labelTop={curve.topFor(hour.temperature)} />
+              <HourColumn key={hour.time} hour={hour} isNow={index === 0} labelTop={curve.topFor(hour.temperature)} unit={unit} />
             ))}
           </div>
         </div>

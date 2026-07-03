@@ -18,7 +18,7 @@ describe('#55 state is conveyed by text, not color alone', () => {
 
   it('UV severity carries a qualitative text label', () => {
     // Arrange / Act
-    render(<DetailedMetricsCard current={buildCurrent()} uv={{ value: 9, label: 'Muito alto' }} windUnit="km/h" />)
+    render(<DetailedMetricsCard current={buildCurrent()} uv={{ value: 9, label: 'Muito alto' }} windUnit="km/h" unit="celsius" />)
 
     // Assert
     expect(screen.getByText('Muito alto')).toBeInTheDocument()

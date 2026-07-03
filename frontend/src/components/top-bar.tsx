@@ -3,10 +3,11 @@ import { CloudSun } from 'lucide-react'
 
 type TopBarProps = {
   searchSlot: ReactNode
+  unitsSlot: ReactNode
   actionsSlot: ReactNode
 }
 
-export function TopBar({ searchSlot, actionsSlot }: TopBarProps) {
+export function TopBar({ searchSlot, unitsSlot, actionsSlot }: TopBarProps) {
   return (
     <header className="wx-topbar">
       <div className="wx-brand">
@@ -16,6 +17,7 @@ export function TopBar({ searchSlot, actionsSlot }: TopBarProps) {
         Tempo<small>Open-Meteo</small>
       </div>
       {searchSlot}
+      {unitsSlot}
       <div className="wx-actions">{actionsSlot}</div>
     </header>
   )

@@ -9,7 +9,7 @@ describe('DailyForecastCard', () => {
     const { daily } = buildPayload()
 
     // Act
-    const { container } = render(<DailyForecastCard days={daily} />)
+    const { container } = render(<DailyForecastCard days={daily} unit="celsius" />)
 
     // Assert — RF12/RF13
     expect(container.querySelectorAll('.wx-drow')).toHaveLength(7)

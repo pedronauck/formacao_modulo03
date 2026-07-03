@@ -1,14 +1,16 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { GeoResult } from '@/types/geo-result'
 import type { WeatherRequest } from '@/types/weather-request'
 import type { GeolocationStatus } from '@/types/geolocation-status'
 import type { WeatherPayload } from '@/types/weather-payload'
+import type { TemperatureUnit } from '@/types/temperature-unit'
 import { useApiStatus } from '@/hooks/use-api-status'
 import { useWeather } from '@/hooks/use-weather'
 import { useCitySearch } from '@/hooks/use-city-search'
 import { useGeolocation } from '@/hooks/use-geolocation'
 import { TopBar } from '@/components/top-bar'
 import { CitySearch } from '@/components/city-search'
+import { UnitsToggle } from '@/components/units-toggle'
 import { GeolocationButton } from '@/components/geolocation-button'
 import { ApiStatusPill } from '@/components/api-status-pill'
 import { WeatherHero } from '@/components/weather-hero'
@@ -50,14 +52,14 @@ function IdlePlaceholder() {
   return <p className="wx-empty">Busque uma cidade ou use sua localização para ver o clima.</p>
 }
 
-function WeatherContent({ data, onRefresh }: { data: WeatherPayload; onRefresh: () => void }) {
+function WeatherContent({ data, unit, onRefresh }: { data: WeatherPayload; unit: TemperatureUnit; onRefresh: () => void }) {
   return (
     <>
-      <WeatherHero location={data.location} current={data.current} today={data.daily[0] ?? null} windUnit={data.units.wind_speed} onRefresh={onRefresh} />
-      <div className="wx-grid"><HourlyForecastCard hours={data.hourly} /></div>
+      <WeatherHero location={data.location} current={data.current} today={data.daily[0] ?? null} windUnit={data.units.wind_speed} unit={unit} onRefresh={onRefresh} />
+      <div className="wx-grid"><HourlyForecastCard hours={data.hourly} unit={unit} /></div>
       <div className="wx-cols">
-        <DailyForecastCard days={data.daily} />
-        <DetailedMetricsCard current={data.current} uv={data.extras.uv} windUnit={data.units.wind_speed} />
+        <DailyForecastCard days={data.daily} unit={unit} />
+        <DetailedMetricsCard current={data.current} uv={data.extras.uv} windUnit={data.units.wind_speed} unit={unit} />
       </div>
       <div className="wx-lower-split">
         <SunArcCard sunrise={data.extras.sun.sunrise} sunset={data.extras.sun.sunset} currentTime={data.current.time} />
@@ -67,7 +69,7 @@ function WeatherContent({ data, onRefresh }: { data: WeatherPayload; onRefresh: 
   )
 }
 
-function DashboardContent({ weather }: { weather: WeatherController }) {
+function DashboardContent({ weather, unit }: { weather: WeatherController; unit: TemperatureUnit }) {
   if (weather.status === 'loading') {
     return <LoadingSkeletons />
   }
@@ -77,7 +79,7 @@ function DashboardContent({ weather }: { weather: WeatherController }) {
   if (weather.status !== 'success' || !weather.data) {
     return <IdlePlaceholder />
   }
-  return <WeatherContent data={weather.data} onRefresh={weather.retry} />
+  return <WeatherContent data={weather.data} unit={unit} onRefresh={weather.retry} />
 }
 
 export function WeatherDashboardPage() {
@@ -85,6 +87,7 @@ export function WeatherDashboardPage() {
   const weather = useWeather()
   const search = useCitySearch()
   const geo = useGeolocation(weather.loadPlace)
+  const [unit, setUnit] = useState<TemperatureUnit>('celsius')
 
   const handleSelect = useCallback(
     (result: GeoResult) => {
@@ -103,10 +106,11 @@ export function WeatherDashboardPage() {
     <div className="wx-app">
       <TopBar
         searchSlot={<CitySearch term={search.term} status={search.status} results={search.results} onTermChange={search.setTerm} onSelect={handleSelect} />}
+        unitsSlot={<UnitsToggle unit={unit} onChange={setUnit} />}
         actionsSlot={<><ApiStatusPill status={apiStatus} /><GeolocationButton status={geo.status} onClick={geo.requestLocation} /></>}
       />
       <GeoNotice status={geo.status} />
-      <DashboardContent weather={weather} />
+      <DashboardContent weather={weather} unit={unit} />
       {showToast && weather.error && (
         <ErrorToast message={weather.error.message} recoverable onRetry={weather.retry} />
       )}
